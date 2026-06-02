@@ -1,0 +1,3 @@
+# The Lambda functions use only boto3, which is preinstalled in the AWS
+# Lambda Python runtime. boto3 is listed here for local development/testing.
+boto3>=1.34.0

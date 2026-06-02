@@ -1,0 +1,26 @@
+# Secrets - NEVER commit these
+.env
+.env.*
+*.pem
+*.key
+aws-credentials*
+credentials
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Packaging / deployment artifacts
+*.zip
+build/
+dist/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
