@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartDoor - Visitor Registration</title>
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body { background: #f2f7ff; font-family: "Segoe UI", Arial, sans-serif; }
+    .card {
+      max-width: 450px; margin: 50px auto; background: white; padding: 30px;
+      border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      border-top: 10px solid #007bff;
+    }
+    h2 { text-align: center; color: #0056b3; margin-bottom: 20px; font-weight: 600; }
+    .btn-custom {
+      background-color: #ffcc00; color: black; font-size: 16px; font-weight: bold;
+      width: 100%; border-radius: 6px; padding: 12px; transition: 0.2s;
+    }
+    .btn-custom:hover { background-color: #ffdb4d; transform: scale(1.03); }
+    label { font-weight: 600; margin-top: 12px; color: #003d80; }
+    .footer-text { margin-top: 15px; font-size: 13px; color: #666; text-align: center; }
+  </style>
+  <script>
+    // ── Configuration ──────────────────────────────────────────────────────
+    // Replace with your API Gateway invoke URL for the POST /visitor-information route.
+    const API_URL = "https://<YOUR_API_ID>.execute-api.<REGION>.amazonaws.com/prod/visitor-information";
+
+    function submitVisitor() {
+      const name = $("#visitor-name").val().trim();
+      const email = $("#visitor-email").val().trim();
+      if (!name || !email) { alert("Please fill in all fields."); return; }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const faceId = urlParams.get("faceId");
+      const fileName = urlParams.get("fileName"); // optional
+
+      if (!faceId) { alert("faceId missing from the URL."); return; }
+
+      const body = {
+        faceId: decodeURIComponent(faceId),
+        name: name,
+        email: email,
+        fileName: fileName ? decodeURIComponent(fileName) : null
+      };
+
+      $.ajax({
+        url: API_URL,
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(body),
+        success: function (res) {
+          alert("Visitor registered successfully!");
+          console.log(res);
+        },
+        error: function (err) {
+          alert("Error registering visitor. Check the console.");
+          console.error(err);
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class="card">
+    <h2>Visitor Registration</h2>
+    <label>Visitor Name</label>
+    <input id="visitor-name" class="form-control" type="text" placeholder="Enter name">
+    <label>Visitor Email</label>
+    <input id="visitor-email" class="form-control" type="text" placeholder="Enter email">
+    <br>
+    <button class="btn btn-custom" onclick="submitVisitor(); return false;">Submit</button>
+    <p class="footer-text">Submitting will allow visitor access after OTP verification.</p>
+  </div>
+</body>
+</html>

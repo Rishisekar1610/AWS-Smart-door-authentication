@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartDoor - OTP Validation</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body { background: #f7faff; font-family: Arial, sans-serif; }
+    .container {
+      width: 420px; margin: 80px auto; background: #ffffff; padding: 30px;
+      border-radius: 15px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      border-top: 10px solid #005bbb;
+    }
+    h2 { text-align: center; color: #005bbb; margin-bottom: 25px; font-weight: bold; }
+    label { font-weight: bold; color: #333; }
+    input {
+      width: 100%; padding: 12px; margin-top: 8px; margin-bottom: 18px;
+      border-radius: 8px; border: 2px solid #ccc; font-size: 16px;
+    }
+    button {
+      width: 100%; padding: 12px; font-size: 18px; background-color: #ffd500;
+      border: none; border-radius: 10px; color: #000; font-weight: bold;
+      cursor: pointer; transition: 0.3s;
+    }
+    button:hover { background-color: #ffcb00; }
+    #result { margin-top: 15px; font-size: 18px; font-weight: bold; text-align: center; }
+  </style>
+  <script>
+    // ── Configuration ──────────────────────────────────────────────────────
+    // Replace with your API Gateway invoke URL for the POST /validate-otp route.
+    const API_URL = "https://<YOUR_API_ID>.execute-api.<REGION>.amazonaws.com/prod/validate-otp";
+
+    function my_submit() {
+      const otpValue = document.getElementById("OTP").value.trim();
+      if (!otpValue) {
+        alert("Please enter the OTP");
+        return;
+      }
+
+      $.ajax({
+        url: API_URL,
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ passcode: otpValue }),
+        success: function (response) {
+          let data = response;
+          if (typeof response === "string") {
+            data = JSON.parse(response);
+          } else if (response.body) {
+            data = JSON.parse(response.body);
+          }
+
+          if (data.access === "granted") {
+            $("#result").html("Access Granted to " + data.visitorName).css("color", "green");
+          } else if (data.access === "expired") {
+            $("#result").html("OTP Expired").css("color", "orange");
+          } else {
+            $("#result").html("Invalid OTP").css("color", "red");
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error("Error:", error, xhr.responseText);
+          alert("Server error. Check your Lambda logs and API Gateway CORS settings.");
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h2>OTP Validation Page</h2>
+    <label>One Time Password (OTP):</label>
+    <input id="OTP" type="text" placeholder="Enter your OTP">
+    <button type="button" onclick="my_submit()">SUBMIT</button>
+    <div id="result"></div>
+    <p style="text-align:center; margin-top:15px; color:#666;">
+      Enter the OTP sent to your email to unlock the Smart Door.
+    </p>
+  </div>
+</body>
+</html>
